@@ -1,5 +1,39 @@
 {%extends 'base.html'%}
 
+<!-- THIS PAGE WILL FETCH ENDPOINTS USING JAVASCRIPT -->
+
 {%block content%}
-<h1> Welcome to the home page</h1>
+
+<div id="tweets"></div>
+
+<script>
+    //setting initial value
+    const content = 'loading...';
+    document.querySelector('#tweets').innerText = content;
+
+    const url = 'http://localhost:8000/tweets/';
+    //fetching tweets
+    const fetchTweets = async () => {
+        let tweets = await axios.get(url);
+        return tweets.data.response;
+    }
+    //setting values
+    const showTweets = async () => {
+        let tweets = await fetchTweets();
+        let list = ''
+        let tweetsElement = document.querySelector('#tweets')
+        for(let tweet of tweets) {
+            list += `<h1> ${tweet.content} </h1>`
+        }
+        tweetsElement.innerHTML = list;
+    }
+    showTweets()
+    
+        
+    // })
+    
+    
+    
+</script>
+
 {%endblock%}
