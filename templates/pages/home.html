@@ -4,18 +4,47 @@
 
 {%block content%}
 
-<div id="tweets"></div>
+<div class="row text-center">
+    <div class="col">
+        <h1>Tweet Home Page</h1>        
+    </div>
+</div>
+<!-- tweets come here -->
+<div id="tweets" class="container row"></div>
 
 <script>
     //setting initial value
     const content = 'loading...';
     document.querySelector('#tweets').innerText = content;
-
+    //tweets array url
     const url = 'http://localhost:8000/tweets/';
     //fetching tweets
     const fetchTweets = async () => {
         let tweets = await axios.get(url);
         return tweets.data.response;
+    }
+    //likes handler function
+    function likesHandler(id, likes) {
+        console.log(id,'has',likes,'likes');
+    }
+    //like button function
+    function likeButton(data) {
+        return `<button 
+        class="btn btn-primary like-button"
+        onClick=likesHandler(${data.id},${data.likes})
+        > 
+        Like 
+        </button>`
+    }
+    //tweets formatter 
+    function tweetFormat(data) {
+        return (
+            `<div class="col-12 col-md-10 mx-auto border-bottom border-top py-2">
+            <p class="tweet" id="tweet-${data.id}"> ${data.content} </p>
+            <div class="btn-group"> ${likeButton(data)} </div>
+            </div>
+            `
+        )
     }
     //setting values
     const showTweets = async () => {
@@ -23,17 +52,13 @@
         let list = ''
         let tweetsElement = document.querySelector('#tweets')
         for(let tweet of tweets) {
-            list += `<h1> ${tweet.content} </h1>`
+            list += tweetFormat(tweet);
         }
         tweetsElement.innerHTML = list;
     }
     showTweets()
-    
-        
-    // })
-    
-    
-    
+    //1:25    
+
 </script>
 
 {%endblock%}
