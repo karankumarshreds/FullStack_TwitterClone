@@ -70,9 +70,9 @@
         tweetsElement.innerHTML = list;
     }
     showTweets();
-    //1:56  
+    //2:22 
     const tweetFormElement = document.querySelector('#tweet-create-form');
-    document.addEventListener('submit', (event) => {
+    tweetFormElement.addEventListener('submit', (event) => {
         event.preventDefault();
         //FormData fetches keyVals of the form's data
         //keys are name of form els and vals are value
