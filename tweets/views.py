@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.http import JsonResponse
 
@@ -12,11 +12,12 @@ def home_view(request, *args, **kwargs):
 #create_view
 def tweet_create_view(request):
     form = TweetForm(request.POST or None)
+    next_url = request.POST.get('next') or None
     if form.is_valid():
         obj = form.save(commit=False)
         obj.save()
-        #to make it empty afer saving
         form = TweetForm()
+        return redirect(next_url)
     context = {
         'form': form
     }
@@ -32,7 +33,6 @@ def tweet_list_view(request):
             {"id": query.id, "content": query.content, "likes": 0} 
             for query in query_set
         ]
-        print(tweet_list)
         data = {
             "response": tweet_list
         }
@@ -57,6 +57,5 @@ def tweet_detail_view(request, id):
     except:
         data['content'] = "Not Found"
         status=404
-
     return JsonResponse(data, status=status)
 

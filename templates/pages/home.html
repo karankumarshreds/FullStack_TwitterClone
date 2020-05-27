@@ -9,6 +9,19 @@
         <h1>Tweet Home Page</h1>        
     </div>
 </div>
+<!-- tweet create form comes here -->
+<div class="row text-center">
+    <div class="col-10 col-md-6 mx-auto">
+        <form class="form" id="tweet-create-form" method="POST" action="/create-tweet/">
+            {%csrf_token%}
+            <!-- using this to redirect to '/' after form submission
+            handled by the create view & fetched as name:'/' -->
+            <input type="hidden" name="next" value="/"/>
+            <input class="form-control my-2" id="tweet-input" name="content" placeholder="Create your tweet"/>
+            <button class="btn btn-primary" type="submit">Save</button>
+        </form>
+    </div>
+</div>
 <!-- tweets come here -->
 <div id="tweets" class="container row"></div>
 
@@ -56,9 +69,25 @@
         }
         tweetsElement.innerHTML = list;
     }
-    showTweets()
+    showTweets();
     //1:56  
-
+    const tweetFormElement = document.querySelector('#tweet-create-form');
+    document.addEventListener('submit', (event) => {
+        event.preventDefault();
+        //FormData fetches keyVals of the form's data
+        //keys are name of form els and vals are value
+        const formData = new FormData(event.target);
+        const url = event.target.getAttribute('action');
+        const method = event.target.getAttribute('method');
+        axios({
+            method: method,
+            url: url,
+            data: formData
+        }).then((res) => {
+            document.querySelector('#tweet-input').value = '';
+            showTweets();
+        })        
+    });
 </script>
 
 {%endblock%}
