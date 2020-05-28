@@ -12,12 +12,18 @@ def home_view(request, *args, **kwargs):
 #create_view
 def tweet_create_view(request):
     form = TweetForm(request.POST or None)
+    #getting the data from the below input field
+    #<input type="hidden" name="next" value="/"/>
     next_url = request.POST.get('next') or None
     if form.is_valid():
         obj = form.save(commit=False)
         obj.save()
+        #the way to check if the request is ajax 
+        if request.is_ajax():
+            return JsonResponse(obj.serialize(), status=201)
+        elif next_url != None:
+            return redirect(next_url)
         form = TweetForm()
-        return redirect(next_url)
     context = {
         'form': form
     }
@@ -29,9 +35,12 @@ def tweet_create_view(request):
 def tweet_list_view(request):
     try:
         query_set = Tweet.objects.all()
+        # tweet_list = [
+        #     {"id": query.id, "content": query.content, "likes": 0} 
+        #     for query in query_set
+        # ]
         tweet_list = [
-            {"id": query.id, "content": query.content, "likes": 0} 
-            for query in query_set
+            query.serialize() for query in query_set
         ]
         data = {
             "response": tweet_list

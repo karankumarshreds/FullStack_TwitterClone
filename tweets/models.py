@@ -5,5 +5,10 @@ class Tweet(models.Model):
     content = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to="images/", blank=True, null=True)
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "content": self.content,
+        }
 
     

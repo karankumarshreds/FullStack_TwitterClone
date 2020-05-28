@@ -28,7 +28,8 @@
 <script>
     //setting initial value
     const content = 'loading...';
-    document.querySelector('#tweets').innerText = content;
+    const tweetContentElement = document.querySelector('#tweets');
+    tweetContentElement.innerText = content;
     //tweets array url
     const url = 'http://localhost:8000/tweets/';
     //fetching tweets
@@ -59,15 +60,16 @@
             `
         )
     }
-    //setting values
+    //setting values on page load
     const showTweets = async () => {
         let tweets = await fetchTweets();
         let list = ''
-        let tweetsElement = document.querySelector('#tweets')
+        // let tweetsElement = document.querySelector('#tweets')
         for(let tweet of tweets) {
             list += tweetFormat(tweet);
         }
-        tweetsElement.innerHTML = list;
+        // tweetsElement.innerHTML = list;
+        tweetContentElement.innerHTML = list;
     }
     showTweets();
     //2:22 
@@ -82,10 +84,20 @@
         axios({
             method: method,
             url: url,
-            data: formData
+            data: formData,
+            //add this for the sake of django to know that
+            //this is an ajax request, not necessary though
+            headers: {
+                "HTTP_X_REQUESTED_WITH" : "XMLHttpRequest",
+                "X-Requested-with": "XMLHttpRequest"
+            }
         }).then((res) => {
+            //emptying the input field 
             document.querySelector('#tweet-input').value = '';
-            showTweets();
+            tweetChildElement = tweetFormat(res.data);
+            tweetContentElement.innerHTML = tweetChildElement + tweetContentElement.innerHTML ;
+            //or I could have done 
+            // showTweets();
         })        
     });
 </script>
