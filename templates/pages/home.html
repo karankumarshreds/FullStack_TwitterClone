@@ -17,7 +17,12 @@
             <!-- using this to redirect to '/' after form submission
             handled by the create view & fetched as name:'/' -->
             <input type="hidden" name="next" value="/"/>
-            <input class="form-control my-2" id="tweet-input" name="content" placeholder="Create your tweet"/>
+            <input class="form-control my-2" 
+              required="required"
+              id="tweet-input" 
+              name="content" 
+              placeholder="Create your tweet"
+            />
             <button class="btn btn-primary" type="submit">Save</button>
         </form>
     </div>
@@ -94,11 +99,19 @@
         }).then((res) => {
             //emptying the input field 
             document.querySelector('#tweet-input').value = '';
-            tweetChildElement = tweetFormat(res.data);
-            tweetContentElement.innerHTML = tweetChildElement + tweetContentElement.innerHTML ;
+            // tweetChildElement = tweetFormat(res.data);
+            // tweetContentElement.innerHTML = tweetChildElement + tweetContentElement.innerHTML ;
             //or I could have done 
-            // showTweets();
-        })        
+            showTweets();
+        }).catch((err) => {
+            let status = err.response.status;
+            if (status === 400) {
+                alert('Text too long or some other issue..')
+            } else if (status === 401){
+                alert('You must login first.')
+            }
+          
+        })
     });
 </script>
 

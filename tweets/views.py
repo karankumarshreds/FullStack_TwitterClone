@@ -15,6 +15,8 @@ def tweet_create_view(request):
     #getting the data from the below input field
     #<input type="hidden" name="next" value="/"/>
     next_url = request.POST.get('next') or None
+    if not request.user.is_authenticated: 
+        return JsonResponse({}, status=401)
     if form.is_valid():
         obj = form.save(commit=False)
         obj.save()
@@ -24,6 +26,8 @@ def tweet_create_view(request):
         elif next_url != None:
             return redirect(next_url)
         form = TweetForm()
+    if form.errors: 
+        return JsonResponse(form.errors, status=400)
     context = {
         'form': form
     }
@@ -42,6 +46,7 @@ def tweet_list_view(request):
         tweet_list = [
             query.serialize() for query in query_set
         ]
+        print(tweet_list)
         data = {
             "response": tweet_list
         }
