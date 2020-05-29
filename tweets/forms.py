@@ -3,6 +3,8 @@ from .models import Tweet
 
 MAX_TWEET_LENGTH = 150
 
+########## wont be using this once we start using serializers ##########
+
 class TweetForm(forms.ModelForm):
     class Meta:
         model = Tweet
