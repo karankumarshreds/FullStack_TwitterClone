@@ -46,6 +46,19 @@
     function likesHandler(id, likes) {
         console.log(id,'has',likes,'likes');
     }
+    //delete handler function
+    function deleteHandler(id) {
+        console.log('Trying to delete ', id)
+        axios({
+            method:'DELETE',
+            url: `http://localhost:8000/delete-tweet/${id}`
+        }).then((res) => {
+            console.log(res)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+    }
     //like button function
     function likeButton(data) {
         return `<button 
@@ -55,12 +68,22 @@
         Like 
         </button>`
     }
+    //delete button function
+    function deleteButton(data) {
+        return `<button 
+        class="btn btn-warning delete-button"
+        onClick=deleteHandler(${data.id})
+        > 
+        Delete 
+        </button>`
+    }
     //tweets formatter 
     function tweetFormat(data) {
         return (
             `<div class="col-12 col-md-10 mx-auto my-2 border py-2">
             <p class="tweet" id="tweet-${data.id}"> ${data.content} </p>
             <div class="btn-group"> ${likeButton(data)} </div>
+            <div class="btn-group"> ${deleteButton(data)} </div>    
             </div>
             `
         )
@@ -108,7 +131,7 @@
             let status = err.response.status;
             if (status === 400) {
                 alert('Text too long or some other issue..')
-            } else if (status === 401){
+            } else if (status === 403){
                 alert('You must login first.')
             }
           

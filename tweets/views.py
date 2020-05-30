@@ -6,8 +6,11 @@ from .models import Tweet
 from .forms import TweetForm
 from .serializers import TweetSerializer
 
+## REST FRAMEWORK ##
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+#only authenticated users are able to create, update and delete
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 
 #home
 def home_view(request, *args, **kwargs):
@@ -15,24 +18,32 @@ def home_view(request, *args, **kwargs):
 
 #create_view using serialiers
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])  ##403 Forbidden
 def tweet_create_view(request):
     serializer = TweetSerializer(data=request.POST)
-    if serializer.is_valid():
+    ##raise exception does what the we are manually
+    ##doing in the last line ##error handling
+    if serializer.is_valid(raise_exception=True):
         #we need the user field as it cannot be null
         serializer.save(user=request.user)
         return Response(serializer.data, status=201)
     return Response({}, status=400)
 
+
 #list view using serializers
 @api_view(['GET'])
 def tweet_list_view(request):
+    #getting all tweets 
     tweets = Tweet.objects.all()
+    #changing all tweets to json
     serializer = TweetSerializer(tweets, many=True)
+    ##serializer.data has all the fields mentioned
+    ##in the serializers file
     data = {
             "response": serializer.data
         }
-    print(serializer)
     return Response(data, status=200)
+
 
 #detail view using serializer
 @api_view(['GET'])
@@ -44,7 +55,23 @@ def tweet_detail_view(request, id):
         "content": serializer.data
     }
     return Response(data, status=200)
-    
+
+
+@api_view(['DELETE', 'POST'])
+@permission_classes([IsAuthenticated])
+def tweet_delete_view(request, id):
+    tweet = Tweet.objects.filter(id=id)
+    if not tweet.exists():
+        return Response({"error": "Tweet doesn't exist"}, status=404)
+    print('#####################################################')
+    print(tweet.get().user)
+    print(request.user)
+    if tweet.get().user != request.user:
+        return Response({"error": "Not authorized"}, status=403)     
+    tweet.get().delete()
+    return Response({}, status=200)
+
+
 
 #create_view without using serializers
 ##### NOT BEING USED #####
