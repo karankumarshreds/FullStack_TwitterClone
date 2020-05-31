@@ -1,9 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-import random
 
 ## this table would have been made with ManyToMany field
-## relation by default, but we want to add a timestamp 
+## relation by default, but we want to add a 'timestamp' 
 ## field as well. Therefore, making this and passing in
 ## the other model's field using "through" attribute
 class TweetLike(models.Model):
@@ -18,6 +17,7 @@ class Tweet(models.Model):
     #foreign key means many-to-one 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField(blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True, null=True)
     image = models.ImageField(upload_to="images/", blank=True, null=True)
     # to check who all liked this post, many users can like 
     # a single post therefore we are using manytomanyfield

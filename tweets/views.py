@@ -4,7 +4,7 @@ from django.http import JsonResponse
 
 from .models import Tweet
 from .forms import TweetForm
-from .serializers import TweetSerializer
+from .serializers import TweetSerializer, LikeActionSerializer
 
 ## REST FRAMEWORK ##
 from rest_framework.response import Response
@@ -63,15 +63,41 @@ def tweet_delete_view(request, id):
     tweet = Tweet.objects.filter(id=id)
     if not tweet.exists():
         return Response({"error": "Tweet doesn't exist"}, status=404)
-    print('#####################################################')
-    print(tweet.get().user)
-    print(request.user)
     if tweet.get().user != request.user:
         return Response({"error": "Not authorized"}, status=403)     
     tweet.get().delete()
     return Response({}, status=200)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def tweet_action_view(request):
+    '''
+    This view handles like, unlike & retweet: Hence, we need a way for Client 
+    Side to send us data which not only tells us the ID but also the action. 
+    All this in a Json format. Thus, we will make another serializer for this. 
+    '''
+    ## The values will come THROUGH this serializer
+    ## To change it to dictionary
+    serializer = LikeActionSerializer(request.POST)
+    if serialzer.is_valid(raise_exception=True):
+        data = serializer._validated_data
+        tweet_id = data['id']
+        action = data['data']
+
+        tweet_obj = Tweet.objects.filter(id=id)    
+        if not tweet_obj.exists():
+            return Response({"error": "Tweet doesn't exist"}, status=404)
+        ## handle action
+        tweet = tweet_obj.get()
+        if action == 'like':
+            tweet.likes.add(request.user)
+        elif action == 'unlike':
+            tweet.likes.remove(request.user)
+        elif action == 'retweet':
+            pass
+
+    return Response({"Error": "Invalid Request"}, status=400)        
 
 #create_view without using serializers
 ##### NOT BEING USED #####
