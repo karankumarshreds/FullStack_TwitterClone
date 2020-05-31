@@ -71,7 +71,7 @@ def tweet_delete_view(request, id):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def tweet_action_view(request):
+def tweet_action_view(request, *args, **kwargs):
     '''
     This view handles like, unlike & retweet: Hence, we need a way for Client 
     Side to send us data which not only tells us the ID but also the action. 
@@ -79,25 +79,30 @@ def tweet_action_view(request):
     '''
     ## The values will come THROUGH this serializer
     ## To change it to dictionary
-    serializer = LikeActionSerializer(request.POST)
-    if serialzer.is_valid(raise_exception=True):
+    serializer = LikeActionSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
         data = serializer._validated_data
-        tweet_id = data['id']
-        action = data['data']
-
-        tweet_obj = Tweet.objects.filter(id=id)    
+        tweet_id = int(data.get('id'))
+        action = str(data['action'])
+        tweet_obj = Tweet.objects.filter(id=tweet_id)    
         if not tweet_obj.exists():
             return Response({"error": "Tweet doesn't exist"}, status=404)
         ## handle action
         tweet = tweet_obj.get()
         if action == 'like':
+            print(tweet.likes.all(), "Likes......")
+            print(request.user)
             tweet.likes.add(request.user)
         elif action == 'unlike':
             tweet.likes.remove(request.user)
         elif action == 'retweet':
             pass
+        return Response({}, status=200)        
+    else:
+        return Response({"Error": "Invalid Request"}, status=400)        
+    
 
-    return Response({"Error": "Invalid Request"}, status=400)        
+    
 
 #create_view without using serializers
 ##### NOT BEING USED #####

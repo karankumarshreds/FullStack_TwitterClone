@@ -120,3 +120,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:8000"
+]
+# CORS_ALLOW_HEADERS =  list(defaults) + [
+#     'X-CSRFTOKEN'
+# ]   
+
+CORS_EXPOSE_HEADERS = (
+    'Access-Control-Allow-Origin: *',
+)

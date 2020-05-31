@@ -31,6 +31,23 @@
 <div id="tweets" class="container row"></div>
 
 <script>
+
+    function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
     //setting initial value
     const content = 'loading...';
     const tweetContentElement = document.querySelector('#tweets');
@@ -44,7 +61,22 @@
     }
     //likes handler function
     function likesHandler(id, likes) {
-        console.log(id,'has',likes,'likes');
+        const data = {
+            id: id,
+            action: "like"
+        }
+        const CSRFToken = getCookie('csrftoken');
+        const url = "http://localhost:8000/tweet-action/"
+        axios({
+            method: 'POST',
+            url: url,
+            data: data,
+            headers: {"X-CSRFToken": CSRFToken}
+        }).then(res => {    
+            showTweets();
+        }).catch(err => {
+            console.log(err)
+        })
     }
     //delete handler function
     function deleteHandler(id) {
@@ -65,7 +97,7 @@
         class="btn btn-primary like-button"
         onClick=likesHandler(${data.id},${data.likes})
         > 
-        Like 
+        Likes ${data.likes}
         </button>`
     }
     //delete button function
